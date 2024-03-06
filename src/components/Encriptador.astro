@@ -1,0 +1,77 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<section class="flex items-center flex-col my-[3rem] xl:flex-row xl:justify-center xl:items-baseline">
+    <div>
+      <textarea id="text_area" placeholder="Ingrese texto aquí" class="placeholder:text-[1.5rem] md:placeholder:text-[2rem] focus:outline-none resize-none w-[18rem] h-[12rem] md:w-[36rem] md:h-[18rem] xl:w-[45rem] xl:h-[35rem] rounded-lg p-4 text-[1.5rem] md:text-[2rem] shadow-[5px_5px_0px_0px_rgba(255,212,59)]"></textarea>
+      <div class="text-slate-300 flex justify-center my-8 items-center gap-5">
+        <button type="button" onclick="encrypt()" class="inline-block rounded-full border-2 border-yellow-300 text-yellow-300 w-[8rem] h-[2rem] md:w-[13rem] md:h-[3rem] text-sm md:text-xl font-medium uppercase leading-normal transition duration-300 ease-in-out focus:outline-none hover:bg-yellow-800">Encriptar</button> 
+        <button type="button" onclick="decrypt()" class="inline-block rounded-full border-2 border-yellow-300 text-yellow-300 w-[8rem] h-[2rem] md:w-[13rem] md:h-[3rem] text-sm md:text-xl font-medium uppercase leading-normal transition duration-300 ease-in-out focus:outline-none hover:bg-yellow-800">Desencriptar</button> 
+      </div>
+    </div>
+    <div class="relative inline-block">
+      <textarea id="encrypted_text_area" class="text-[1.5rem] md:text-[2rem] focus:outline-none resize-none w-[18rem] h-[12rem] md:w-[36rem] md:h-[18rem] xl:w-[20rem] xl:h-[35rem] xl:ml-[5rem] rounded-lg p-4 text-xl shadow-[5px_5px_0px_0px_rgba(255,212,59)]"></textarea>
+      <button onclick="copyText()" class="absolute bottom-[1rem] right-[0.75rem] z-10">
+        <Icon name="copy-solid" class="text-[2rem] transition-all duration-150 hover:scale-125" />
+      </button>
+    </div>
+</section>
+
+<script is:inline>
+  // Selecting elements
+  const textArea = document.getElementById('text_area');
+  const encryptedTextArea = document.getElementById('encrypted_text_area');
+
+  // Dictionary for encryption and decryption
+  let dictionary = {
+    "a": "ai",
+    "e": "enter",
+    "i": "imes",
+    "o": "ober",
+    "u": "ufat",
+  }
+
+  // Encrypt function
+  function encrypt() {
+    const text = textArea.value.toLowerCase();
+    let encryptedText = "";
+
+    for (let i = 0; i < text.length; i++) { // Loop through the text
+      const char = text[i]; // Get the character at the current index
+      encryptedText += char in dictionary ? dictionary[char] : char; // If the character is in the dictionary, add the value to the encrypted text, otherwise add the character itself
+    }
+
+    textArea.value = ""; // Set the value of the encrypted text area to the encrypted text
+    encryptedTextArea.value = encryptedText; // Set the value of the encrypted text area to the encrypted text
+  }
+
+  // Decrypt function
+  function decrypt() {
+    let encryptedText = encryptedTextArea.value;
+
+    for (const [key, value] of Object.entries(dictionary)) { // Loop through the dictionary separating the key and value
+      const regex = new RegExp(value, 'g'); // Create a regular expression to match all occurrences of the value
+      encryptedText = encryptedText.replace(regex, key); // Replace all occurrences of the value with the key
+    }
+    
+    encryptedTextArea.value = ""; // Set the value of the encrypted text area to the decrypted text
+    textArea.value = encryptedText; // Set the value of the encrypted text area to the decrypted text
+  }
+
+  function copyText() {
+    let textArea = document.getElementById("encrypted_text_area");
+
+    // Select the text in the text area
+    textArea.select();
+    textArea.setSelectionRange(0, 99999); // For mobile devices
+
+    try {
+        // Execute the copy command
+        document.execCommand("copy");
+    } catch (error) {
+        console.error("Error copying text: ", error);
+    }
+}
+
+</script>
